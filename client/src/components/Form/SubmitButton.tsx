@@ -1,7 +1,11 @@
 import { useFormikContext } from "formik";
 import Button from "../Button";
 
-const SubmitButton = ({ title }) => {
+interface SubmitButtonProps {
+  title: string;
+}
+
+const SubmitButton = ({ title }: SubmitButtonProps) => {
   const { handleSubmit } = useFormikContext();
   return (
     <Button

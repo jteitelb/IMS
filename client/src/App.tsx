@@ -31,8 +31,7 @@ function App() {
     amount: Yup.number().required().label("amount"),
   });
 
-  const handleSumbit = (values: object) => {
-    console.log("hi");
+  const handleSubmit = (values: object) => {
     console.log(values);
   };
 
@@ -41,9 +40,9 @@ function App() {
       <Form
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={handleSumbit}
+        onSubmit={handleSubmit}
       >
-        <FormField label="Part No" name="partno" type="text" />
+        <FormField label="Part No." name="partno" type="text" />
         <FormField label="Item" name="item" type="text" />
         <FormField label="UOM" name="uom" type="text" />
         <FormField label="Amount" name="amount" type="number" />
