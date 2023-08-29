@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
-import FormField from "./components/Form/FormField";
-import Form from "./components/Form/Form";
-import SubmitButton from "./components/Form/SubmitButton";
-import * as Yup from "yup";
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
 
 function App() {
   // const [data, setData] = useState(null);
@@ -17,40 +21,17 @@ function App() {
   //   getData();
   // }, []);
 
-  const initialValues = {
-    partno: "",
-    item: "",
-    uom: "",
-    amount: "",
-  };
-
-  const validationSchema = Yup.object().shape({
-    partno: Yup.string().required().label("Part No."),
-    Item: Yup.string().required().label("Item"),
-    uom: Yup.string().required().max(4).label("UOM"),
-    amount: Yup.number().required().label("amount"),
-  });
-
-  const handleSumbit = (values: object) => {
-    console.log("hi");
-    console.log(values);
-  };
-
-  return (
-    <div className="bg-slate-300 h-screen w-screen">
-      <Form
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSumbit}
-      >
-        <FormField label="Part No" name="partno" type="text" />
-        <FormField label="Item" name="item" type="text" />
-        <FormField label="UOM" name="uom" type="text" />
-        <FormField label="Amount" name="amount" type="number" />
-        <SubmitButton title="Add" />
-      </Form>
-    </div>
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path="/">
+        <Route index element={<Home />} />
+        <Route path="/dashboard" element={<Layout />}>
+          <Route path="products" element={<Products />} />
+        </Route>
+      </Route>
+    )
   );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

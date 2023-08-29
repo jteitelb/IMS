@@ -12,11 +12,11 @@ const FormField = ({
   const { setFieldTouched, setFieldValue, errors, touched, values } =
     useFormikContext();
   return (
-    <div className="mb-4 flex flex-col gap-2">
-      <span className="flex w-1/3 justify-between">
+    <div className="flex flex-col gap-2 mb-4">
+      <span className="flex justify-between w-1/3">
         <label>{label}</label>
         <input
-          className="border border-slate-400 rounded-md "
+          className="border rounded-md border-slate-400 "
           type={type}
           onBlur={() => setFieldTouched(name)}
           onChange={(event) => {
