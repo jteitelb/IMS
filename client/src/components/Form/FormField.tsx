@@ -1,6 +1,15 @@
 import { useFormikContext } from "formik";
 import ErrorMessage from "./ErrorMessage";
 
+interface FormFieldProps {
+  name: string;
+  noSpace?: boolean;
+  noDec?: boolean;
+  label: string;
+  type: string;
+  props?: any[];
+}
+
 const FormField = ({
   name,
   noSpace = false,
@@ -8,8 +17,8 @@ const FormField = ({
   label,
   type,
   ...props
-}) => {
-  const { setFieldTouched, setFieldValue, errors, touched, values } =
+}: FormFieldProps) => {
+  const { setFieldTouched, setFieldValue, errors, touched, values }: any =
     useFormikContext();
   return (
     <div className="flex flex-col gap-2 mb-4">
