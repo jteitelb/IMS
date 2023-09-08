@@ -1,7 +1,37 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-//const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+
+const productSchema = new mongoose.Schema(
+  {
+    partno: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    item: {
+      type: String,
+      required: true,
+    },
+    uom: {
+      type: String,
+      required: true,
+      maxLength: 4,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
+const Product = mongoose.model("Product", productSchema);
+
+mongoose
+  .connect("mongodb://127.0.0.1:27017/test")
+  .then(() => console.log("Connected!"));
 
 const app = express();
 
@@ -9,10 +39,26 @@ app.use(morgan("dev"));
 
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.json({
-    test: "It worked!",
+app.use("/products", express.urlencoded({ extended: false }));
+
+app.get("/products", async (req, res) => {
+  const products = await Product.find({});
+  res.json(products);
+});
+
+app.get("/products/:partno", async (req, res) => {
+  const product = await Product.findOne({ partno: req.params.partno });
+  res.json(product);
+});
+
+app.post("/products", async (req, res) => {
+  const newProduct = await Product.create({
+    partno: req.body.partno,
+    item: req.body.item,
+    uom: req.body.uom,
+    amount: parseInt(req.body.amount),
   });
+  res.json(newProduct);
 });
 
 const port = 3000;
