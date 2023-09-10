@@ -54,6 +54,11 @@ app.get("/products/:partno", async (req, res) => {
   res.json(product);
 });
 
+app.delete("/products/:partno", async (req, res) => {
+  const product = await Product.deleteOne({ partno: req.params.partno });
+  res.json(product);
+});
+
 app.post("/products", async (req, res) => {
   const newProduct = await Product.create({
     partno: req.body.partno,
