@@ -42,12 +42,15 @@ app.use(cors());
 app.use("/products", express.urlencoded({ extended: false }));
 
 app.get("/products", async (req, res) => {
-  const products = await Product.find({});
+  const products = await Product.find({}, "partno item uom amount");
   res.json(products);
 });
 
 app.get("/products/:partno", async (req, res) => {
-  const product = await Product.findOne({ partno: req.params.partno });
+  const product = await Product.findOne(
+    { partno: req.params.partno },
+    "partno item uom amount"
+  );
   res.json(product);
 });
 
