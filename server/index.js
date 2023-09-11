@@ -37,7 +37,11 @@ const app = express();
 
 app.use(morgan("dev"));
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://127.0.0.1:5173",
+  })
+);
 
 app.use("/products", express.urlencoded({ extended: false }));
 
@@ -54,14 +58,24 @@ app.get("/products/:partno", async (req, res) => {
   res.json(product);
 });
 
+app.delete("/products/:partno", async (req, res) => {
+  const product = await Product.deleteOne({ partno: req.params.partno });
+  res.json(product);
+});
+
 app.post("/products", async (req, res) => {
-  const newProduct = await Product.create({
-    partno: req.body.partno,
-    item: req.body.item,
-    uom: req.body.uom,
-    amount: parseInt(req.body.amount),
-  });
-  res.json(newProduct);
+  try {
+    const newProduct = await Product.create({
+      partno: req.body.partno,
+      item: req.body.item,
+      uom: req.body.uom,
+      amount: parseInt(req.body.amount),
+    });
+    res.json(newProduct);
+  } catch (error) {
+    res.statusCode = 409;
+    res.json(error);
+  }
 });
 
 const port = 3000;

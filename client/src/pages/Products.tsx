@@ -4,8 +4,15 @@ import FormField from "../components/Form/FormField";
 import SubmitButton from "../components/Form/SubmitButton";
 import { useState, useEffect } from "react";
 
+interface Product {
+  partno: string;
+  item: string;
+  uom: string;
+  amount: number;
+}
+
 const Products = () => {
-  const [productList, setProductList] = useState([]);
+  const [productList, setProductList]: any = useState([]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:3000/products")
@@ -15,8 +22,6 @@ const Products = () => {
         return [];
       });
   }, []);
-
-  console.log(productList);
 
   const initialValues = {
     partno: "",
@@ -59,16 +64,40 @@ const Products = () => {
             <th>Item</th>
             <th>UOM</th>
             <th>Amount</th>
+            <th className="text-red-700">Delete</th>
           </tr>
         </thead>
         <tbody>
-          {productList.map(({ partno, item, uom, amount }) => {
+          {productList.map(({ partno, item, uom, amount }: Product) => {
             return (
-              <tr className="even:bg-slate-200 odd:bg-white">
+              <tr key={partno} className="even:bg-slate-200 odd:bg-white">
                 <td>{partno}</td>
                 <td>{item}</td>
                 <td>{uom}</td>
                 <td>{amount}</td>
+                <td className="m">
+                  <div
+                    className="bg-slate-500 w-8 text-center font-bold text-neutral-800 rounded-4 border-2 border-slate-600 cursor-pointer"
+                    onClick={async () => {
+                      console.log(partno);
+                      const response: any = await fetch(
+                        `http://127.0.0.1:3000/products/${partno}`,
+                        {
+                          method: "DELETE",
+                        }
+                      ).then((res) => res.json());
+                      console.log(response);
+                      if (response?.deletedCount == "1") {
+                        setProductList((currList: Product[]) =>
+                          currList.filter((prod) => prod.partno != partno)
+                        );
+                      }
+                      console.log(response);
+                    }}
+                  >
+                    X
+                  </div>
+                </td>
               </tr>
             );
           })}
