@@ -3,45 +3,26 @@ const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema(
-  {
-    partno: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    item: {
-      type: String,
-      required: true,
-    },
-    uom: {
-      type: String,
-      required: true,
-      maxLength: 4,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+require("dotenv").config();
 
-const Product = mongoose.model("Product", productSchema);
-
-mongoose
-  .connect("mongodb://127.0.0.1:27017/test")
-  .then(() => console.log("Connected!"));
+const middlewares = require("./middlewares");
+const { Product } = require("./models/Product");
 
 const app = express();
+
+mongoose.connect(process.env.DB_URI).then(() => console.log("DB Connected!"));
 
 app.use(morgan("dev"));
 
 app.use(
   cors({
-    origin: "http://127.0.0.1:5173",
+    origin: process.env.CORS_ORIGIN,
   })
 );
+
+app.get("/", (req, res) => {
+  res.json({ message: "IMS" });
+});
 
 app.use("/products", express.urlencoded({ extended: false }));
 
@@ -73,12 +54,16 @@ app.post("/products", async (req, res) => {
     });
     res.json(newProduct);
   } catch (error) {
-    res.statusCode = 409;
+    res.status(409);
     res.json(error);
   }
 });
 
-const port = 3000;
+app.use(middlewares.notFound);
+
+app.use(middlewares.errorHandler);
+
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
