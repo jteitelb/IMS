@@ -37,9 +37,23 @@ const Products = () => {
     amount: Yup.number().required().label("amount"),
   });
 
-  const handleSubmit = (values: object) => {
-    console.log("hi");
+  const handleSubmit = async (values: any) => {
     console.log(values);
+    const body = new URLSearchParams(values).toString();
+    const response = await fetch(`http://127.0.0.1:3000/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: body,
+    }).then((res) => res.json());
+    if (response?.partno == values.partno) {
+      setProductList((currList: Product[]) => {
+        const newList = [...currList];
+        newList.push(values);
+        return newList;
+      });
+    }
   };
 
   return (
