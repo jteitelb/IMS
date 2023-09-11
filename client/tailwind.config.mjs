@@ -1,7 +1,5 @@
-/* https://github.com/tailwindlabs/tailwindcss-intellisense/issues/399 */
-
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
