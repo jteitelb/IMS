@@ -7,7 +7,6 @@ const notFound = (req, res, next) => {
 const errorHandler = (error, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode);
-  console.log(process.env.NODE_ENV);
   res.json({
     message: error.message,
     stack: process.env.NODE_ENV === "dev" ? error.stack : "production mode",
