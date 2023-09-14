@@ -2,13 +2,14 @@ import * as Yup from "yup";
 import Form from "../components/Form/Form";
 import FormField from "../components/Form/FormField";
 import SubmitButton from "../components/Form/SubmitButton";
+import ProductTable from "../components/ProductTable";
 import { useState, useEffect } from "react";
 
-interface Product {
+export interface Product {
   partno: string;
   item: string;
   uom: string;
-  amount: number;
+  amount: string;
 }
 
 const Products = () => {
@@ -23,7 +24,7 @@ const Products = () => {
       });
   }, []);
 
-  const initialValues = {
+  const initialValues: Product = {
     partno: "",
     item: "",
     uom: "",
@@ -34,11 +35,10 @@ const Products = () => {
     partno: Yup.string().required().label("Part No."),
     item: Yup.string().required().label("Item"),
     uom: Yup.string().required().max(4).label("UOM"),
-    amount: Yup.number().required().label("amount"),
+    amount: Yup.number().required().positive().label("amount"),
   });
 
   const handleSubmit = async (values: any) => {
-    console.log(values);
     const body = new URLSearchParams(values).toString();
     const response = await fetch(`http://127.0.0.1:3000/products`, {
       method: "POST",
@@ -48,12 +48,22 @@ const Products = () => {
       body: body,
     }).then((res) => res.json());
     if (response?.partno == values.partno) {
-      setProductList((currList: Product[]) => {
-        const newList = [...currList];
-        newList.push(values);
-        return newList;
-      });
+      addProduct(values);
     }
+  };
+
+  const deleteProduct = (partno: any) => {
+    setProductList((currList: Product[]) =>
+      currList.filter((prod) => prod.partno != partno)
+    );
+  };
+
+  const addProduct = (product: Product) => {
+    setProductList((currList: Product[]) => {
+      const newList = [...currList];
+      newList.push(product);
+      return newList;
+    });
   };
 
   return (
@@ -71,52 +81,7 @@ const Products = () => {
       </Form>
 
       <h2 className="mt-5 text-lg font-bold">Current Items</h2>
-      <table className="w-3/4 border-2 border-slate-400 text-left">
-        <thead>
-          <tr>
-            <th>Part No</th>
-            <th>Item</th>
-            <th>UOM</th>
-            <th>Amount</th>
-            <th className="text-red-700">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productList.map(({ partno, item, uom, amount }: Product) => {
-            return (
-              <tr key={partno} className="even:bg-slate-200 odd:bg-white">
-                <td>{partno}</td>
-                <td>{item}</td>
-                <td>{uom}</td>
-                <td>{amount}</td>
-                <td className="m">
-                  <div
-                    className="bg-slate-500 w-8 text-center font-bold text-neutral-800 rounded-4 border-2 border-slate-600 cursor-pointer"
-                    onClick={async () => {
-                      console.log(partno);
-                      const response: any = await fetch(
-                        `http://127.0.0.1:3000/products/${partno}`,
-                        {
-                          method: "DELETE",
-                        }
-                      ).then((res) => res.json());
-                      console.log(response);
-                      if (response?.deletedCount == "1") {
-                        setProductList((currList: Product[]) =>
-                          currList.filter((prod) => prod.partno != partno)
-                        );
-                      }
-                      console.log(response);
-                    }}
-                  >
-                    X
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <ProductTable products={productList} deleteProduct={deleteProduct} />
     </div>
   );
 };
