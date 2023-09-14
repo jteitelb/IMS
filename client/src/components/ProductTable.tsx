@@ -29,16 +29,8 @@ function ProductTable({
               <td className="m">
                 <div
                   className="bg-slate-500 w-8 text-center font-bold text-neutral-800 rounded-4 border-2 border-slate-600 cursor-pointer"
-                  onClick={async () => {
-                    const response: any = await fetch(
-                      `http://127.0.0.1:3000/products/${partno}`,
-                      {
-                        method: "DELETE",
-                      }
-                    ).then((res) => res.json());
-                    if (response?.deletedCount == "1") {
-                      deleteProduct(partno);
-                    }
+                  onClick={() => {
+                    deleteProduct(partno);
                   }}
                 >
                   X
