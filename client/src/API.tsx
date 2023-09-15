@@ -8,11 +8,11 @@ const getProducts = async () => {
 };
 
 const addProduct = async (product: Product) => {
-  const body = new URLSearchParams({ ...product }).toString();
+  const body = JSON.stringify(product);
   const response = await fetch(`${API_URL}/products`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      "Content-Type": "application/json",
     },
     body: body,
   });
