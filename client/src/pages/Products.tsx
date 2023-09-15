@@ -4,6 +4,7 @@ import FormField from "../components/Form/FormField";
 import SubmitButton from "../components/Form/SubmitButton";
 import ProductTable from "../components/ProductTable";
 import { useState, useEffect } from "react";
+import { getProducts, addProduct, deleteProduct } from "../API";
 
 export interface Product {
   partno: string;
@@ -15,13 +16,17 @@ export interface Product {
 const Products = () => {
   const [productList, setProductList]: any = useState([]);
 
+  const updateProducts = async () => {
+    try {
+      const products = await getProducts();
+      setProductList(products);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    fetch("http://127.0.0.1:3000/products")
-      .then((res) => res.json().then((json) => setProductList(json)))
-      .catch((err) => {
-        console.log(err);
-        return [];
-      });
+    updateProducts();
   }, []);
 
   const initialValues: Product = {
@@ -38,40 +43,19 @@ const Products = () => {
     amount: Yup.number().required().positive().label("amount"),
   });
 
-  const handleSubmit = async (values: any) => {
-    const body = new URLSearchParams(values).toString();
-    const response = await fetch(`http://127.0.0.1:3000/products`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: body,
-    }).then((res) => res.json());
-    if (response?.partno == values.partno) {
-      addProduct(values);
-    }
-  };
-
-  const deleteProduct = (partno: any) => {
-    setProductList((currList: Product[]) =>
-      currList.filter((prod) => prod.partno != partno)
-    );
-  };
-
-  const addProduct = (product: Product) => {
-    setProductList((currList: Product[]) => {
-      const newList = [...currList];
-      newList.push(product);
-      return newList;
-    });
-  };
-
   return (
     <div className="w-full h-full p-2">
       <Form
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={handleSubmit}
+        onSubmit={async (product: Product) => {
+          try {
+            await addProduct(product);
+            updateProducts();
+          } catch (error) {
+            console.error(error);
+          }
+        }}
       >
         <FormField label="Part No" name="partno" type="text" />
         <FormField label="Item" name="item" type="text" />
@@ -81,7 +65,17 @@ const Products = () => {
       </Form>
 
       <h2 className="mt-5 text-lg font-bold">Current Items</h2>
-      <ProductTable products={productList} deleteProduct={deleteProduct} />
+      <ProductTable
+        products={productList}
+        deleteProduct={async (partno: string) => {
+          try {
+            await deleteProduct(partno);
+            updateProducts();
+          } catch (error) {
+            console.error(error);
+          }
+        }}
+      />
     </div>
   );
 };
